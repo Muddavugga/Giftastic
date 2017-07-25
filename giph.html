@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head><script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+	<title>GIPH</title>
+</head>
+<body>
+
+
+
+
+<div id="giphSrch"></div>
+
+
+      <label for="giphyLabel">Add a Giph</label>
+      <input type="text" id="giphInput"><br>
+      <button id="giphAdd" value="Get Your Giph!">Get Your Giph!</button>
+ <div id="container"></div>
+
+
+<script type="text/javascript">
+	
+var topics = ["pink floyd", "Nirvana", "Soundgarden", "Norah Jones", "Ramones", "Misfits", "Metallica", "Nine Inch Nails", "Blind Pilot"];
+
+function alertGiph() {
+	alert($(this).attr("data-name"));
+}
+
+
+function display()
+       {
+        // emptying the div
+        $("#giphSrch").empty();
+        // creating a for loop to run through the array
+        for (var i = 0; i < topics.length; i++) {
+          // inside the code, declaring a variable for the button that you are going to be adding
+         var a = $("<button>");
+         // then adding a class for the button variable, and giving the class a name
+         a.addClass("giph");
+         // then set the attribute and give it a name, then give it the value of the global variable name of the array and [i] 
+         a.attr("data-name", topics[i]);
+         // give the new button text
+         a.text(topics[i]);
+         // append the new button the div
+         $("#giphSrch").append(a);
+        }
+        
+      }
+
+      $("#giphAdd").on("click", function (event) {
+      	event.preventDefault();
+
+      	var giphData = $("#giphInput").val().trim();
+
+      	topics.push(giphData);
+      	$("#giphInput").val("");
+      	display();
+      })
+
+      // $(document).on("click", ".giph", alertGiph);
+
+display();
+
+      function retrieveAPI() {
+        var btnText = $(this).text();
+        var queryURL = "http://api.giphy.com/v1/gifs/search?q="+btnText+"&api_key=ce99e8fde0584e2fa999de48ff3853c9&tag=&limit=10";
+        $.ajax({
+          url:queryURL,
+          method: "GET"
+        }).done(function(response) {
+          var total =response.data.length;
+          console.log(total);
+          for (i=0; i < total; i++){
+            var imgTag = $("<img>");
+            imgTag.addClass("giphClass");
+            imgTag.attr("src",response.data[i].images.fixed_height_still.url);
+            imgTag.attr("data-still",response.data[i].images.fixed_height_still.url);
+            imgTag.attr("data-animate", response.data[i].images.fixed_height.url);
+            imgTag.attr("data-state", "still");
+            $("#container").append(imgTag);
+           // var stillIMG = response.data[i].images.fixed_height_still.url;
+
+          }
+          
+
+
+        })
+      }
+
+      $(document).on("click", ".giphClass", function() {
+
+        var imgState = $(this).attr("data-state");
+        var imgAnimate = $(this).attr("data-animate");
+         var imgStill = $(this).attr("data-still");
+        if (imgState === "still") {
+          $(this).attr("src", imgAnimate);
+        $(this).attr("data-state", imgStill);  
+        }
+
+        else {
+         
+          $(this).attr("src", imgStill);
+        }
+
+      })
+      $(document).on("click", ".giph", retrieveAPI);
+
+
+</script>
+
+
+</body>
+</html>
